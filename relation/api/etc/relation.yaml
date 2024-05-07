@@ -1,0 +1,11 @@
+Name: Relation
+Host: 127.0.0.1
+Port: 8100
+Auth:
+  AccessSecret: github.com/ikun666/kun_chat
+  AccessExpire: 86400
+RelationRpc:
+  Etcd:
+    Hosts:
+    - 192.168.44.132:2379
+    Key: relation.rpc

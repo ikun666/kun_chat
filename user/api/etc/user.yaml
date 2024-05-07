@@ -1,0 +1,12 @@
+Name: User
+Host: 127.0.0.1
+Port: 8000
+
+Auth:
+  AccessSecret: github.com/ikun666/kun_chat
+  AccessExpire: 86400
+UserRpc:
+  Etcd:
+    Hosts:
+    - 192.168.44.132:2379
+    Key: user.rpc

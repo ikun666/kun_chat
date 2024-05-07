@@ -1,0 +1,75 @@
+syntax = "proto3";
+package relation;
+option go_package = "./relation";
+
+// 用户登录
+message AddFriendRequest {
+  int64 Uid = 1;
+  int64 Tid = 2;
+  int64 Type = 3;
+}
+message AddFriendResponse {
+
+}
+// 用户登录
+
+// 用户注册
+message DelFriendRequest {
+  int64 Uid = 1;
+  int64 Tid = 2;
+  int64 Type = 3;
+}
+message DelFriendResponse {
+
+}
+// 用户注册
+
+// 用户信息
+message GetFriendsRequest {
+  int64 Uid = 1;
+  int64 Type=2;
+}
+message GetFriendsResponse {
+  repeated int64 Tid = 1;
+}
+// 用户信息
+//----------------------------
+message AddGroupRequest {
+  int64 Uid = 1;
+  string GroupName =2;
+}
+message AddGroupResponse {
+
+}
+// 用户信息
+message DelGroupRequest {
+  int64 Uid = 1;
+  string GroupName =2;
+}
+message DelGroupResponse {
+
+}
+// 用户信息
+message GetGroupsRequest {
+  int64 Uid = 1;
+}
+message Group{
+  int64 Gid = 1;
+  string GroupName =2;
+}
+message GetGroupsResponse {
+  repeated Group Groups=1;
+}
+// 用户信息
+service Relation {
+  rpc AddFriend(AddFriendRequest) returns(AddFriendResponse);
+  rpc DelFriend(DelFriendRequest) returns(DelFriendResponse);
+  rpc GetFriends(GetFriendsRequest) returns(GetFriendsResponse);
+
+  rpc AddGroup(AddGroupRequest) returns(AddGroupResponse);
+  rpc DelGroup(DelGroupRequest) returns(DelGroupResponse);
+  rpc GetGroups(GetGroupsRequest) returns(GetGroupsResponse);
+}
+
+
+

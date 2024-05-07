@@ -1,0 +1,62 @@
+type (
+	AddFriendRequest {
+		Uid  int64 `json:"uid"`
+		Tid  int64 `json:"tid"`
+		Type int64 `json:"type"`
+	}
+	DelFriendRequest {
+		Uid  int64 `json:"uid"`
+		Tid  int64 `json:"tid"`
+		Type int64 `json:"type"`
+	}
+	GetFriendsRequest {
+		Uid  int64 `json:"uid"`
+		Type int64 `json:"type"`
+	}
+	GetFriendsResponse {
+		Tid []int64 `json:"tid"`
+	}
+	//----------------------------------------
+	AddGroupRequest {
+		Uid  int64  `json:"uid"`
+		Name string `json:"name"`
+	}
+	DelGroupRequest {
+		Uid  int64  `json:"uid"`
+		Name string `json:"name"`
+	}
+	GetGroupsRequest {
+		Uid int64 `json:"uid"`
+	}
+	Group {
+		Gid  int64  `json:"gid"`
+		Name string `json:"name"`
+	}
+	GetGroupsResponse {
+		Groups []Group `json:"groups"`
+	}
+)
+
+@server (
+	jwt: Auth
+)
+service Relation {
+	@handler AddFriend
+	post /api/relation/addFriend (AddFriendRequest)
+
+	@handler DelFriend
+	post /api/relation/delFriend (DelFriendRequest)
+
+	@handler GetFriends
+	post /api/relation/getFriends (GetFriendsRequest) returns (GetFriendsResponse)
+
+	@handler AddGroup
+	post /api/relation/addGroup (AddGroupRequest)
+
+	@handler DelGroup
+	post /api/relation/delGroup (DelGroupRequest)
+
+	@handler GetGroups
+	post /api/relation/getGroups (GetGroupsRequest) returns (GetGroupsResponse)
+}
+
