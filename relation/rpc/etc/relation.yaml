@@ -1,7 +1,7 @@
 Name: relation.rpc
-ListenOn: 127.0.0.1:9100
+ListenOn: 0.0.0.0:9100
 Etcd:
   Hosts:
-  - 192.168.44.132:2379
+  - etcd:2379
   Key: relation.rpc
-DNS: root:123456@tcp(192.168.44.132:3306)/kun_chat?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai
+DNS: root:123456@tcp(mysql:3306)/kun_chat?charset=utf8mb4&parseTime=true

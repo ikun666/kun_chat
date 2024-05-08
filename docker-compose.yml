@@ -1,0 +1,148 @@
+version: "3.0"
+networks:
+  kun-net:           # 网络
+    driver: bridge    # 桥接模式
+
+services:
+  userrpc:
+    build: 
+      context: user/rpc
+      dockerfile: Dockerfile
+      # target: case-service
+    restart: always #重启docker后该容器也重启
+    container_name: userrpc #容器名称
+    ports:
+      - "9000:9000" #本地端口号与容器内部端口号
+    networks:
+      - kun-net
+
+    depends_on:
+      - mysql
+      - etcd
+    #entrypoint.sh脚本的使用：   -d 引号中跟的是[主机]:[端口] ，有多个以空格隔开，代表要检测的服务。
+    #当所检测的服务均可用(端口可连通)，则会执行 -c 引号中的命令。使用这个脚本可以同时检测多个依赖项。
+    # volumes:
+    #   - "./wait-for.sh:/wait-for.sh"
+    # volumes:
+    #   - "./entrypoint.sh:/entrypoint.sh"
+    # entrypoint: sh /entrypoint.sh  -d '0.0.0.0:3306 0.0.0.0:2379' -c '/userrpc -f /user.yaml'
+    # command: sh -c "/wait-for.sh mysql:3306 -t 10 -- /userrpc -f /user.yaml"
+  userapi:
+    build: 
+      context: user/api
+      dockerfile: Dockerfile
+    restart: always #重启docker后该容器也重启
+    container_name: userapi #容器名称
+    ports:
+      - "8000:8000" #本地端口号与容器内部端口号
+    depends_on:
+      - userrpc
+    networks:
+      - kun-net
+    # volumes:
+    #   - "./entrypoint.sh:/entrypoint.sh"
+    # volumes:
+    #   - "./wait-for.sh:/wait-for.sh"
+    # entrypoint: sh /entrypoint.sh  -d '0.0.0.0:3306 0.0.0.0:2379' -c '/userapi -f /user.yaml'
+    # command: sh -c "/wait-for.sh mysql:3306 -t 10 -- /userapi -f /user.yaml"
+  relationrpc:
+    build: 
+      context: relation/rpc
+      dockerfile: Dockerfile
+    restart: always #重启docker后该容器也重启
+    container_name: relationrpc #容器名称
+    ports:
+      - "9100:9100" #本地端口号与容器内部端口号
+    networks:
+      - kun-net
+    depends_on:
+      - mysql
+      - etcd
+    # volumes:
+    #   - "./entrypoint.sh:/entrypoint.sh"
+    # entrypoint: sh /entrypoint.sh  -d '0.0.0.0:3306 0.0.0.0:2379 '
+  relationapi:
+    build: 
+      context: relation/api
+      dockerfile: Dockerfile
+    restart: always #重启docker后该容器也重启
+    container_name: relationapi #容器名称
+    ports:
+      - "8100:8100" #本地端口号与容器内部端口号
+    depends_on:
+      - relationrpc
+    networks:
+      - kun-net
+    # volumes:
+    #   - "./entrypoint.sh:/entrypoint.sh"
+    # entrypoint: sh /entrypoint.sh  -d '0.0.0.0:9100'
+  chatapi:
+    build: 
+      context: chat/api
+      dockerfile: Dockerfile
+    restart: always #重启docker后该容器也重启
+    container_name: chatapi #容器名称
+    ports:
+      - "8200:8200" #本地端口号与容器内部端口号
+    networks:
+      - kun-net
+    depends_on:
+      - mysql
+      - redis
+    # volumes:
+    #   - "./entrypoint.sh:/entrypoint.sh"
+    # entrypoint: sh /entrypoint.sh  -d '0.0.0.0:6379 0.0.0.0:3306' 
+  mysql:
+    image: mysql #镜像名称以及版本
+    restart: always #重启docker后该容器也重启
+    container_name: mysql #容器名称
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456 #指定用户密码
+      TZ: Asia/Shanghai
+    ports:
+      - "3306:3306" #本地端口号与容器内部端口号
+    networks:
+      - kun-net
+    volumes: #指定挂载目录
+      - /usr/etc/mysql/datadir:/var/lib/mysql
+      - /usr/etc/mysql/config/my.cnf:/etc/mysql/my.cnf
+    command:
+      # --max_connections=1000
+      --character-set-server=utf8mb4
+      # --collation-server=utf8mb4_general_ci
+      # --default-authentication-plugin=mysql_native_password
+  redis:
+     image: redis #指定版本
+     restart: always # 重启方式-表示容器在退出后会自动重新启动
+     container_name: redis #自定义容器名
+     environment:
+      - TZ=Asia/Shanghai # 设置时区
+     ports: #端口映射
+      - "6379:6379"
+     networks:
+      - kun-net
+     sysctls: # 设置容器中的内核参数
+      - net.core.somaxconn=1024
+     privileged: true #使用该参数，container内的root拥有真正的root权限。否则，container内的root只是外部的一个普通用户权限
+  etcd:
+    image: bitnami/etcd:latest  # 镜像
+    container_name: etcd       # 容器名 --name
+    restart: always             # 总是重启
+    ports:                      # 端口映射 -p
+      - "2379:2379"
+      - "2380:2380"
+    networks:
+      - kun-net
+    environment:                # 环境变量 --env
+      - ALLOW_NONE_AUTHENTICATION=yes                       # 允许不用密码登录
+      # - ETCD_NAME=etcd1                                     # etcd 的名字
+      # - ETCD_INITIAL_ADVERTISE_PEER_URLS=http://etcd1:2380  # 列出这个成员的伙伴 URL 以便通告给集群的其他成员
+      # - ETCD_LISTEN_PEER_URLS=http://0.0.0.0:2380           # 用于监听伙伴通讯的URL列表
+      # - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379         # 用于监听客户端通讯的URL列表
+      # - ETCD_ADVERTISE_CLIENT_URLS=http://etcd1:2379        # 列出这个成员的客户端URL，通告给集群中的其他成员
+      # - ETCD_INITIAL_CLUSTER_TOKEN=etcd-cluster             # 在启动期间用于 etcd 集群的初始化集群记号
+      # - ETCD_INITIAL_CLUSTER=etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380 # 为启动初始化集群配置
+      # - ETCD_INITIAL_CLUSTER_STATE=new                      # 初始化集群状态
+    # volumes:
+    #   - etcd1_data:/bitnami/etcd                            # 挂载的数据卷
+  

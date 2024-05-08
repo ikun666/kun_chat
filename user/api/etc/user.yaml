@@ -1,5 +1,5 @@
 Name: User
-Host: 127.0.0.1
+Host: 0.0.0.0
 Port: 8000
 
 Auth:
@@ -8,5 +8,7 @@ Auth:
 UserRpc:
   Etcd:
     Hosts:
-    - 192.168.44.132:2379
+    - etcd:2379
     Key: user.rpc
+
+# SleepTime: 20

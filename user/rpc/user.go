@@ -22,9 +22,13 @@ func main() {
 	flag.Parse()
 
 	var c config.Config
+	fmt.Println("rpc 1")
 	conf.MustLoad(*configFile, &c)
+	// time.Sleep(time.Duration(c.SleepTime) * time.Second)
+	// fmt.Println("sleep time", c.SleepTime, "s")
+	fmt.Println("rpc 2")
 	ctx := svc.NewServiceContext(c)
-
+	fmt.Println("rpc 3")
 	s := zrpc.MustNewServer(c.RpcServerConf, func(grpcServer *grpc.Server) {
 		user.RegisterUserServer(grpcServer, server.NewUserServer(ctx))
 

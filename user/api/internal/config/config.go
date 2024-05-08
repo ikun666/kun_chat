@@ -12,4 +12,5 @@ type Config struct {
 		AccessExpire int64
 	}
 	UserRpc zrpc.RpcClientConf
+	// SleepTime int64
 }

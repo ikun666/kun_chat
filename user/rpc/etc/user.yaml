@@ -1,11 +1,12 @@
 Name: user.rpc
-ListenOn: 127.0.0.1:9000
+ListenOn: 0.0.0.0:9000
 Etcd:
   Hosts:
-  - 192.168.44.132:2379
+  - etcd:2379
   Key: user.rpc
 
-DNS: root:123456@tcp(192.168.44.132:3306)/kun_chat?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai
-
+DNS: root:123456@tcp(mysql:3306)/kun_chat?charset=utf8mb4&parseTime=true
 
 Salt: github.com/ikun666/kun_chat
+
+# SleepTime: 20
